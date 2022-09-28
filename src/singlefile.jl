@@ -26,7 +26,8 @@ function measurezero(h, dev, path="zeros"; twait=10)
 end
 
 
-function execute_experiment_file(fname, setup::ExperimentSetup, viewfun;
+function execute_experiment_file(fname, setup::ExperimentSetup,
+                                 viewfun=nothing;
                                  init=1, cont=false, measure_zero=true)
     # I will not overwrite anything, except if we explicitly say so
     # using keyword cont=true
@@ -105,6 +106,9 @@ function execute_experiment_file(fname, setup::ExperimentSetup, viewfun;
         end
         i += 1
         println("===========================")
+        if !isnothing(viewfun)
+            viewfun(i, X, fname)
+        end
         println("\n\n")
     end
 
