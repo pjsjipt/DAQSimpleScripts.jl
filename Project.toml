@@ -4,6 +4,8 @@ authors = ["Paulo Jabardo <pjabardo@ipt.br>"]
 version = "0.1.0"
 
 [deps]
+DAQCore = "7b03aed3-9854-4651-ba28-76b88bef8818"
+DAQHDF5 = "3679571a-6675-409e-9618-c02a2349284e"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
