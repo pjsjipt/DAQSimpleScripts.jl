@@ -3,7 +3,6 @@ using Statistics
 # Visualizing MeasData stuff
 
 using GLMakie
-export viewmeasdata
 
 function viewmeasdata(f, x::MeasData, p, params; title="",
                      show_means=true, ymeanlimits=nothing, meanlines=nothing)
