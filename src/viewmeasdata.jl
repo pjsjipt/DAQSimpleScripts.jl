@@ -4,7 +4,7 @@ using Statistics
 
 using GLMakie
 
-function viewmeasdata(f, x::MeasData, p, params; title="",
+function viewmeasdata(f, x::MeasData, p, params; title=nothing,
                      show_means=true, ymeanlimits=nothing, meanlines=nothing)
     
     # We will divide the the figure in 3 regions:
@@ -17,7 +17,12 @@ function viewmeasdata(f, x::MeasData, p, params; title="",
     hstr = [string(daqtime(x)); plab]
     hlab = [Label(header[2,i], hstr[i], tellwidth=false)
             for i in eachindex(hstr)]
-    htitle = Label(header[1,:], devname(x), tellwidth=false)
+    if isnothing(title)
+        htitle = Label(header[1,:], devname(x), tellwidth=false)
+    else
+        htitle = Label(header[1,:], title, tellwidth=false)
+    end
+        
 
 
     fdata = f[2,1] = GridLayout()
