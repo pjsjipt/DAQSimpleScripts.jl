@@ -11,7 +11,8 @@ using DAQHDF5
 abstract type AbstractSimpleScript <: AbstractExperiment end
 
 export DaqExpSingleFile, DaqExpMultFiles, execute_experiment
-export viewmeasdata
+export viewmeasdata, loadbuildsurf, viewsurfdata
+
 
 include("measurepoint.jl")
 include("measurezero.jl")

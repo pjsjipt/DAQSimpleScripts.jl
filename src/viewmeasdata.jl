@@ -1,31 +1,38 @@
 import Dates
 using Statistics
+import DelimitedFiles: readdlm
+
 # Visualizing MeasData stuff
 
 using GLMakie
 
 function viewmeasdata(f, x::MeasData, p, params; title=nothing,
-                     show_means=true, ymeanlimits=nothing, meanlines=nothing)
+                     show_means=true, ymeanlimits=nothing, meanlines=nothing, layout=:vertical, showheader=true)
     
     # We will divide the the figure in 3 regions:
     # One is the header - It will show the device name, time
     # and experimental point.
     # Then we will show the time series and finally the mean values
-    header = f[1,1] = GridLayout(tellwidth=false)
+    if showheader
+        header = f[1,1] = GridLayout(tellwidth=false)
     
-    plab = ["$par = $pt" for (pt,par) in zip(p,params)]
-    hstr = [string(daqtime(x)); plab]
-    hlab = [Label(header[2,i], hstr[i], tellwidth=false)
-            for i in eachindex(hstr)]
-    if isnothing(title)
-        htitle = Label(header[1,:], devname(x), tellwidth=false)
-    else
-        htitle = Label(header[1,:], title, tellwidth=false)
+        plab = ["$par = $pt" for (pt,par) in zip(p,params)]
+        hstr = [string(daqtime(x)); plab]
+        hlab = [Label(header[2,i], hstr[i], tellwidth=false)
+                for i in eachindex(hstr)]
+        if isnothing(title)
+            htitle = Label(header[1,:], devname(x), tellwidth=false)
+        else
+            htitle = Label(header[1,:], title, tellwidth=false)
+        end
     end
-        
-
-
-    fdata = f[2,1] = GridLayout()
+    
+    if showheader
+        fdata = f[2,1] = GridLayout()
+    else
+        fdata = f[1,1]
+    end
+    
     show_ts=true
 
     
@@ -99,7 +106,8 @@ function viewmeasdata(f, x::MeasData, p, params; title=nothing,
     end
 
     if show_means
-        axm = Axis(fdata[1,2], title="Mean")
+        fmeans = layout==:vertical ? fdata[2,1] : fdata[1,2]
+        axm = Axis(fmeans, title="Mean")
         if !isnothing(ymeanlimits)
             ylims!(axm, ymeanlimits)
         end
@@ -126,6 +134,48 @@ function viewmeasdata(f, x::MeasData, p, params; title=nothing,
     
 end
 
+function viewsurfdata(fig, msh, u; title="")
+    ax = Axis3(fig[1,1], title=title, aspect=:data, viewmode=:fit)
+
+    mesh!(ax, msh.vertices, msh.faces, color=u)
+                  
+end
+
+
+function loadbuildsurf(fname, delim='\t')
+    tab = readdlm(fname, delim, Float64)
+    if size(tab,2) != 13
+        error("Wrong number of columns when reading BuildingSurface object. Should be 13!")
+    end
+    ntri = size(tab,1)
+    
+    pts = zeros(ntri*3, 3)
+    faces = zeros(Int, ntri, 3)
+    iside = zeros(Int, ntri)
+    eside = zeros(Int, ntri)
+    itag = zeros(Int, ntri)
+    etag = zeros(Int,ntri)
+
+    i = 1
+    for k in 1:ntri
+        pts[i,:]   .= tab[k,1:3]
+        pts[i+1,:] .= tab[k,4:6]
+        pts[i+2,:] .= tab[k,7:9]
+        faces[k,:] .= [i, i+1, i+2]
+        eside[k]  = tab[k,10]
+        iside[k]  = tab[k,11]
+        etag[k]   = tab[k,12]
+        itag[k]   = tab[k,13]
+        i += 3
+    end
+    # Makie uses vertex data, so each cell data should be repeated!
+    return (vertices=pts, faces=faces,
+            eside=repeat(eside,inner=3),
+            iside=repeat(iside,inner=3),
+            etag=repeat(etag,inner=3),
+            itag=repeat(itag,inner=3))
+    
+end
 
 function create_measdata(nchans=64, rate=100.0, nsamples=100; devname="Example")
     
