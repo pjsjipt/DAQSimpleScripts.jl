@@ -67,7 +67,8 @@ function execute_experiment(daqexp::AbstractSimpleScript, viewfun=nothing;
 
 
     # Ponto inicial
-    setpoint!(daqexp.setup, init)
+    startplan!(daqexp.setup)
+    setpoint!(daqexp.setup, i)
     i = init
 
     while movenext!(daqexp.setup)
