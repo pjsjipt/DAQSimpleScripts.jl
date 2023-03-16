@@ -65,11 +65,11 @@ function execute_experiment(daqexp::AbstractSimpleScript, viewfun=nothing;
     println("Podemos começar as medições? Pressione ENTER para confirmar.")
     readline()
 
+    i = init
 
     # Ponto inicial
     startplan!(daqexp.setup)
     setpoint!(daqexp.setup, i)
-    i = init
 
     while movenext!(daqexp.setup)
         point = daqpoint(daqexp.setup, i)
